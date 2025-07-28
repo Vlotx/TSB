@@ -131,7 +131,7 @@ local function TeleportAndClick()
             local targetHRP = targetPlayer.Character.HumanoidRootPart
             -- วาร์ปใกล้ขึ้น จาก 5 เป็น 2
             myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 5)
-            task.wait(0.3)
+            task.wait(0.1)
             ClickCenter()
         end
     else
