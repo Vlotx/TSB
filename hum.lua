@@ -145,22 +145,20 @@ local function TeleportAndClick()
             if currentTrash and currentTrash.Parent then
                 local broken = currentTrash.Parent:GetAttribute("Broken")
                 if broken == "flash" then
-                    -- ข้าม Trashcan นี้
                     trashIndex = trashIndex + 1
                     if trashIndex > #trashCanList then
                         trashIndex = 1
                     end
                 else
-                    -- เช็คผ่านแล้ว วาร์ปได้
                     myHRP.CFrame = currentTrash.CFrame * CFrame.new(0, 0, 2)
-                    task.wait(0.3)
+                    task.wait(1) -- ✅ รอ 1 วิ ก่อนคลิก
                     ClickCenter()
 
                     trashIndex = trashIndex + 1
                     if trashIndex > #trashCanList then
                         trashIndex = 1
                     end
-                    break -- ออกจาก while เพราะทำงานกับ trashcan นี้เสร็จแล้ว
+                    break
                 end
             else
                 table.remove(trashCanList, trashIndex)
@@ -171,6 +169,7 @@ local function TeleportAndClick()
         end
     end
 end
+
 
 
 task.spawn(function()
