@@ -129,9 +129,8 @@ local function TeleportAndClick()
         local targetPlayer = Players:FindFirstChild(selectedPlayerName)
         if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
             local targetHRP = targetPlayer.Character.HumanoidRootPart
-            -- วาร์ปใกล้ขึ้น จาก 5 เป็น 2
-            myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 5)
-            task.wait(0.1)
+            myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 2)
+            task.wait(0.3)
             ClickCenter()
         end
     else
@@ -151,18 +150,18 @@ local function TeleportAndClick()
                     if trashIndex > #trashCanList then
                         trashIndex = 1
                     end
-                    continue
-                end
+                else
+                    -- เช็คผ่านแล้ว วาร์ปได้
+                    myHRP.CFrame = currentTrash.CFrame * CFrame.new(0, 0, 2)
+                    task.wait(0.3)
+                    ClickCenter()
 
-                myHRP.CFrame = currentTrash.CFrame * CFrame.new(0, 0, 2)
-                task.wait(0.3)
-                ClickCenter()
-
-                trashIndex = trashIndex + 1
-                if trashIndex > #trashCanList then
-                    trashIndex = 1
+                    trashIndex = trashIndex + 1
+                    if trashIndex > #trashCanList then
+                        trashIndex = 1
+                    end
+                    break -- ออกจาก while เพราะทำงานกับ trashcan นี้เสร็จแล้ว
                 end
-                break
             else
                 table.remove(trashCanList, trashIndex)
                 if trashIndex > #trashCanList then
