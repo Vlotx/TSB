@@ -121,56 +121,68 @@ local function TeleportAndClick()
     local me = Players.LocalPlayer
     if not (me and me.Character and me.Character:FindFirstChild("HumanoidRootPart")) then return end
     local myHRP = me.Character.HumanoidRootPart
-
-    local trashCanInMe = me.Character:FindFirstChild("Trash Can")
     local trashFolder = workspace:FindFirstChild("Map") and workspace.Map:FindFirstChild("Trash")
 
-    if trashCanInMe and trashCanInMe:IsA("MeshPart") then
-        local targetPlayer = Players:FindFirstChild(selectedPlayerName)
-        if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            local targetHRP = targetPlayer.Character.HumanoidRootPart
-            myHRP.CFrame = targetHRP.CFrame * CFrame.new(0, 0, 2)
-            task.wait(0.3)
-            ClickCenter()
-        end
-    else
-        if #trashCanList == 0 then
-            RefreshTrashCanList(trashFolder)
-            trashIndex = 1
-        end
+    while tp do -- เช็คว่าปุ่มเปิดอยู่
+        -- รีเช็ค TrashCan ในตัวผู้เล่น
+        local trashCanInMe = me.Character:FindFirstChild("Trash Can")
 
-        while #trashCanList > 0 do
-            local currentTrash = trashCanList[trashIndex]
+        if trashCanInMe and trashCanInMe:IsA("MeshPart") then
+            -- มี Trash Can อยู่ในตัว -> วาปไปหาผู้เล่นเป้าหมาย
+            local targetPlayer = Players:FindFirstChild(selectedPlayerName)
+            if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                myHRP.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, 5)
+                task.wait(0.3)
+                if not tp then break end -- ถ้าปุ่มปิดให้หยุดทันที
+                ClickCenter()
+            end
+        else
+            -- ไม่มี Trash Can -> หา Trashcan ใหม่
+            if #trashCanList == 0 then
+                RefreshTrashCanList(trashFolder)
+                trashIndex = 1
+            end
 
-            if currentTrash and currentTrash.Parent then
-                local broken = currentTrash.Parent:GetAttribute("Broken")
-                if broken == "flash" then
-                    -- ข้าม Trashcan นี้
-                    trashIndex = trashIndex + 1
-                    if trashIndex > #trashCanList then
-                        trashIndex = 1
+            while tp and #trashCanList > 0 do
+                local currentTrash = trashCanList[trashIndex]
+
+                if currentTrash and currentTrash.Parent then
+                    local broken = currentTrash.Parent:GetAttribute("Broken")
+
+                    -- ข้ามถ้า Broken == true
+                    if broken == true then
+                        trashIndex = trashIndex + 1
+                        if trashIndex > #trashCanList then
+                            trashIndex = 1
+                        end
+                    else
+                        -- วาปไป Trashcan
+                        myHRP.CFrame = currentTrash.CFrame * CFrame.new(0, 0, 2)
+                        task.wait(0.3)
+                        if not tp then break end -- ถ้าปิดปุ่มหยุดทันที
+
+                        -- คลิกเรื่อยๆ จนกว่าจะได้ MeshPart หรือปิดปุ่ม
+                        while tp and not (me.Character:FindFirstChild("Trash Can") and me.Character["Trash Can"]:IsA("MeshPart")) do
+                            ClickCenter()
+                            task.wait(0.2)
+                        end
+                        break
                     end
                 else
-                    -- เช็คผ่านแล้ว วาร์ปได้
-                    myHRP.CFrame = currentTrash.CFrame * CFrame.new(0, 0, 2)
-                    task.wait(0.3)
-                    ClickCenter()
-
-                    trashIndex = trashIndex + 1
+                    -- ลบออกจาก list ถ้าไม่มีอยู่แล้ว
+                    table.remove(trashCanList, trashIndex)
                     if trashIndex > #trashCanList then
                         trashIndex = 1
                     end
-                    break -- ออกจาก while เพราะทำงานกับ trashcan นี้เสร็จแล้ว
-                end
-            else
-                table.remove(trashCanList, trashIndex)
-                if trashIndex > #trashCanList then
-                    trashIndex = 1
                 end
             end
         end
+
+        task.wait(0.2)
     end
 end
+
+
 
 
 
